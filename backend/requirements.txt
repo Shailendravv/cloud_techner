@@ -1,0 +1,90 @@
+# Every Python dependency for this project, in one file.
+#
+#     python -m venv .venv
+#     source .venv/bin/activate      # Windows: .venv/Scripts/activate
+#     pip install -r requirements.txt
+#
+# That single command gets you the API server, the CLI, the evaluation
+# harness, the test suite, the ingestion pipeline and the documentation site.
+# Nothing else to install.
+#
+# The sections below are informational - they record why each package is here,
+# and which ones are only needed for part of the workflow. Everything is
+# installed either way.
+
+
+# ---------------------------------------------------------------------------
+# 1. Runtime - the agent, the API, and anything a request actually touches
+# ---------------------------------------------------------------------------
+# Kept deliberately small. Vercel's Python bundler does no tree-shaking and
+# LangChain is a documented cause of bundle-size failures, so we take langgraph
+# and langchain-core only and talk to Groq, Gemini, Supabase, Cloudinary and
+# Langfuse through their HTTP APIs or their own thin SDKs rather than through
+# provider wrappers.
+fastapi==0.115.6
+pydantic==2.10.4
+groq==0.13.1
+langgraph==0.2.60
+langchain-core==0.3.28
+rank-bm25==0.2.2
+python-frontmatter==1.1.0
+
+# Embeddings for the dev profile (APP_ENV=dev, config/dev.json). Small.
+google-genai==0.3.0
+
+# Tracing. The SDK rather than a hand-rolled exporter: the forty lines of
+# urllib it replaces produced a structurally wrong trace - one timestamp for
+# every span, so nothing had a duration, and the Groq calls as strings rather
+# than `generation` observations, so no model, no tokens and no cost anywhere
+# in Langfuse. The SDK brings the OpenTelemetry runtime and the data model
+# those numbers live in.
+langfuse==4.15.4
+
+# Deliberately NOT here, and talked to over stdlib urllib instead:
+#   supabase    - drags in gotrue, storage3, realtime, postgrest for what is
+#                 two JSON POSTs to PostgREST
+#   cloudinary  - three HTTP calls and a SHA-1
+
+
+# ---------------------------------------------------------------------------
+# 2. Running the server locally
+# ---------------------------------------------------------------------------
+# In a serverless deploy the platform provides the server; locally you need it
+# yourself. Without uvicorn, `uvicorn app.main:app --reload` and start.sh both
+# fail on a venv that otherwise installed cleanly.
+uvicorn==0.34.0
+
+
+# ---------------------------------------------------------------------------
+# 3. Tests
+# ---------------------------------------------------------------------------
+# The suite runs offline - no network, no API key.  `pytest -q`
+pytest==8.3.4
+pytest-asyncio==0.25.0
+pytest-mock==3.14.0
+httpx==0.28.1
+
+# Offline embeddings, so the evaluation harness is deterministic,
+# un-rate-limited and runnable with no API key. This is the big one: the first
+# install pulls ~200 MB of onnxruntime, and the first run downloads a model.
+# Used by the local profile (APP_ENV=local, EMBEDDER=local); the dev profile
+# uses Gemini instead.
+fastembed==0.5.1
+
+
+# ---------------------------------------------------------------------------
+# 4. Ingestion pipeline
+# ---------------------------------------------------------------------------
+# PDF -> markdown for the ingest pipeline. Runs from the CLI or a GitHub
+# Action, never inside a request handler.
+pymupdf4llm==0.0.17
+
+
+# ---------------------------------------------------------------------------
+# 5. Documentation site
+# ---------------------------------------------------------------------------
+# The docs in backend/docs/ are a browsable site.  `mkdocs serve` then open
+# http://127.0.0.1:8000 - or `mkdocs build` for a static site/ directory.
+mkdocs==1.6.1
+mkdocs-material==9.6.7
+pymdown-extensions==10.14.3
