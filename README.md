@@ -540,8 +540,7 @@ checked-in `runbooks/` — so it serves correctly with only a `GROQ_API_KEY` set
 
 ## Design notes
 
-The full write-up — retrieval choice, the measurements, and what it does not
-handle well — is in **[WRITEUP.md](WRITEUP.md)**. Longer-form architecture notes
+Longer-form architecture notes
 are in [`docs/`](docs/) (`mkdocs serve` to read them as a site).
 
 Three decisions worth knowing about, because each was measured rather than
