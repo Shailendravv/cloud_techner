@@ -442,8 +442,7 @@ seeing the output.
 **Twenty for twenty is a score to distrust, and the write-up says why.** The
 corpus is self-authored and twenty questions is a small sample; freezing both
 before any retrieval code existed limits the overfitting but cannot rule it out.
-Treat these as provisional — see [WRITEUP.md](WRITEUP.md) §3. The honest claim is
-narrower than the number: on the twenty cases written to break it, including the
+The honest claim is narrower than the number: on the twenty cases written to break it, including the
 five near-duplicate traps and the five unanswerable questions, nothing got
 through.
 
@@ -496,8 +495,7 @@ design against a known weakness than to discover it in review.
 - **Three things are built but never executed against the real service**, for
   want of credentials: the SQL migrations, the FileStore/SupabaseStore
   equivalence test (skipped, and a skip is not a pass), and the Cloudinary
-  upload round-trip. [WRITEUP.md](WRITEUP.md) §7 says exactly what that leaves
-  unverified.
+  upload round-trip.
 - **Free-tier fragility.** 8k tokens a minute, and `qwen/qwen3.8-27b` is a
   preview model. Both are someone else's capacity, not ours.
 
